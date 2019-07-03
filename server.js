@@ -1,63 +1,76 @@
-var bodyParser = require('body-parser')
-var mongoose = require('mongoose')
-// var logger = require('morgan');
+const express = require("express")
+const mongoose = require("mongoose")
+const logger = require("morgan")
+const path = require("path")
+const axios = require("axios")
+const cheerio = require("cheerio")
 
-var cheerio = require("cheerio");
-var axios = require("axios");
+const app = express()
 
-// var path = require('path');
+const PORT = process.env.PORT || 8080
 
-var mongojs = require('mongojs');
+app.use(logger("dev"))
 
-var express = require('express');
-var app = express();
-var exphbs = require('express-handlebars');
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+app.use(express.static("public"))
+app.use(express.static("views"))
 
-app.use(
-    bodyParser.urlencoded({
-        extended: false
-    })
-);
-// app.use(logger('dev'));
+const exphbs = require("express-handlebars")
 
-var port = process.env.PORT || 8080;
-
-app.engine('handlebars', exphbs({ defaultLayout: 'main' }))
-// Parse request body as JSON
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-// Make public a static folder
-app.use(express.static(__dirname + '/public'));
+app.engine("handlebars", exphbs({ defaultLayout: "main" }))
+app.set("view engine", "handlebars")
 
 const db = require("./models")
 
-mongoose.connect("mongodb://localhost/s2kScraper", { useNewUrlParser: true })
+let MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/webscraper";
 
-// Make a request via axios to grab the HTML body from the site of your choice
-axios.get("https://news.vice.com/en_us").then(function (response) {
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 
-    // Load the HTML into cheerio and save it to a variable
-    var $ = cheerio.load(response.data);
-    
-    // An empty array to save the data that we'll scrape
-    var articles = {};
-
-    $('section._jnvm1n').each((i, element) => { 
-        let article = $('article.unit')
-        console.log(article.children.toString());
-        
+// Routes
+app.get("/", (req, res) => {
+    db.Article.find({}).then(dbArticle => {
+        // console.log(dbArticle)
+        res.render("index", {articles: dbArticle});
     });
-    
-    
+})
 
+app.get("/articles", (req, res) => {
+    db.Article.find({}).then(dbArticle => {
+        res.json(dbArticle)
+    }).catch(err => {
+        res.json(err)
+    })
+})
+// Make a request via axios to grab the HTML body from the site of your choice
+axios.get("https://bleacherreport.com/featured/").then(function(response) {
 
-    // $(element).find("h3").find("a").text()
-    
+  // Load the HTML into cheerio and save it to a variable
+  // '$' becomes a shorthand for cheerio's selector commands, much like jQuery's '$'
+  var $ = cheerio.load(response.data);
 
-    // Log the results once you've looped through each of the elements found with cheerio
+  // An empty array to save the data that we'll scrape
+  var results = [];
+
+  // Select each element in the HTML body from which you want information.
+  // NOTE: Cheerio selectors function similarly to jQuery's selectors,
+  // but be sure to visit the package's npm page to see how it works
+  $("li.featuredImage").each(function(i, element) {
+
+    var link = $(element).find('div.articleMedia').find('a').attr('href');
+    // var link = $(element).find("a").attr("href");
+    var articleTitle = $(element).find('div.commentary').find('h3').text();
+    // Save these results in an object that we'll push into the results array we defined earlier
+    results.push({
+      articleTitle: articleTitle,
+      link: link
+    });
+  });
+
+  // Log the results once you've looped through each of the elements found with cheerio
+  console.log(results);
 });
 
-app.listen(port, function () {
-    console.log('App running on port ' + port + '!');
+app.listen(PORT, function () {
+    console.log('App running on port ' + PORT + '!');
 });

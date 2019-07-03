@@ -9,7 +9,7 @@ var CommentSchema = new Schema({
         type: String
     },
     // `link` is required and of type String
-    link: {
+    body: {
         type: String,
         required: true,
     }

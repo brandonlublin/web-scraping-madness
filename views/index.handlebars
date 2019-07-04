@@ -1,8 +1,9 @@
-<div id="wrapper">
-    <h1>Note Scraper</h1>
-    <h2><i>Latest News in NBA Free Agency</i></h2>
+<div id="wrapper" class='card gray'>
+    <h1>Web Scraping Madness</h1>
+    <h2><i>Latest News around the world of Sports</i></h2>
     <div id="col s3"></div>
-    <h5 class='card z-depth-3 center-align col s6'>Click 'Scrape' to get the latest news Articles from Bleacher Report.</h5>
+    <h5 class='card center-align col s6'>Click 'Scrape' to get the latest news Articles from Bleacher Report.</h5>
+    <a href='/scrape'>Scrape</a>
 </div>
 <div class="row">
     <div class='col s2'></div>
@@ -10,7 +11,7 @@
         {{#each article}}
             <div>
                 <h3>{{this.title}}</h3>
-                <a href="/readArticle/{{this._id}}" class='waves-effect waves-light btn' id='signUp'>Read Article</a>
+                <a href="/articles/{{this._id}}" class='waves-effect waves-light btn' id='signUp'>Read Article</a>
             </div>
         {{/each}}
     </div>

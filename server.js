@@ -15,7 +15,7 @@ app.use(logger('dev'));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public/'));
 app.use(express.static('views'));
 
 const exphbs = require('express-handlebars');
@@ -45,35 +45,31 @@ app.get('/scrape', (req, res) => {
     var $ = cheerio.load(response.data);
 
     // An empty array to save the data that we'll scrape
-    var results = [];
+    
 
     // Select each element in the HTML body from which you want information.
     $('li.featuredImage').each((i, element) => {
-        var link = $(element)
+
+        var results = {};
+        results.link = $(element)
             .find('div.articleMedia')
             .find('a')
             .attr('href');
-        // var link = $(element).find("a").attr("href");
-        var articleTitle = $(element)
+        // var link = $(element).find('a').attr('href');
+        results.title = $(element)
             .find('div.commentary')
             .find('h3')
             .text();
-        var articleSummary = $(element)
+        results.summary = $(element)
             .find('div.articleContent')
             .find('p.articleDescription')
             .text();
-        var img = $(element)
+        results.image = $(element)
             .find('div.articleMedia')
             .find('a.thumbnailImage')
             .find('img.lazyImage')
             .attr('src');
-        // Save these results in an object that we'll push into the results array we defined earlier
-        results.push({
-            articleTitle: articleTitle,
-            link: link,
-            summary: articleSummary,
-            image: img,
-        });
+
         db.Article.create(results)
             .then(function(dbArticle) {
                 console.log(dbArticle);
@@ -82,15 +78,10 @@ app.get('/scrape', (req, res) => {
                 console.log(err);
             });
         });
-        // Log the results once you've looped through each of the elements found with cheerio
-        console.log(results);
+
         
     });
 });
-
-app.post('/insert', (req, res) => {});
-
-app.post('/update', (req, res) => {});
 
 app.get('/article', (req, res) => {
     //retrieves articles from db
@@ -106,6 +97,23 @@ app.get('/article', (req, res) => {
         })
     );
 });
+
+
+app.post('/articles/:id', function(req, res) {
+    // TODO
+    // ====
+    // save the new note that gets posted to the Notes collection
+    // then find an article from the req.params.id
+    // and update it's 'note' property with the _id of the new note
+    db.Comment.create(req.body)
+    .then(function(dbNote) {
+        return db.Article.findOneAndUpdate({}, { $push: { notes: dbComment._id } }, { new: true });
+    }).then(function(dbArticle) {
+        res.json(dbArticle)
+    })
+});
+
+app.post('/update', (req, res) => {});
 
 app.listen(PORT, () => {
     console.log('App running on port ' + PORT + '!');

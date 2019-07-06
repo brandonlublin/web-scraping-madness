@@ -1,21 +1,25 @@
-<div id='wrapper' class='card gray col m12'>
-    <h1>Web Scraping Madness</h1>
-    <h2><i>Latest News around the world of Sports</i></h2>
-    <div id='col s3'></div>
+<div class="row">
+    <div class='col s12'>
+        <div class='card'>
+            <h1>BR Web Scraping Madness</h1>
+            <h2><i>Latest News around the world of Sports</i></h2>     
+        </div>
+    </div> 
 </div>
+
 <div class='row'>
-    <div class='col s6'></div>
-    <div class='col s8 left-align'>
+    <div class='col s12'>
         {{#each articles}}
         <div class='card'>
             <div class='card-header'>
-                <a href='{{link}}' target='_blank' class='title'>{{title}}</a>
+                <h5 class='title'>{{title}}</h2>
             </div>
             <div class='card-body'>
                 <img src='{{image}}' id='articleImage' alt='image'>
                 <p class='card-text'>{{summary}}</p>
-                <a href='/save' class='btn btn-dark ml-auto'>Save this Article</a>
-                <a href='/comment' class='btn btn-dark ml-auto'>Comment</a>
+                <a href='{{link}}' class='btn btn-dark ml-auto'>Read Article</a>
+                <a href='/saved' class='btn btn-dark ml-auto'>Save this Article</a>
+                <a href='#' class='btn btn-dark ml-auto'>Comment</a>
             </div>
             <div id='comments'>{{comments}}</div>
         </div>

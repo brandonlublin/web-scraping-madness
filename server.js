@@ -113,7 +113,15 @@ app.post('/articles/:id', function(req, res) {
     })
 });
 
-app.post('/update', (req, res) => {});
+app.get("/saved", function (req, res) {
+    db.Article.find({saved: true})
+        .then(function(savedArticles) {
+            res.render("saved", {articles: savedArticles});
+        })
+        .catch(function(err) {
+            console.log(err);
+        });
+});
 
 app.listen(PORT, () => {
     console.log('App running on port ' + PORT + '!');

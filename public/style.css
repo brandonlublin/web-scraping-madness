@@ -5,3 +5,10 @@
 .card {
     padding: 20px;
 }
+.left-align {
+    padding: 0;
+}
+body {
+    background-image: url('/images/background.jpg');
+    background-attachment: fixed
+}
